@@ -14,7 +14,7 @@
         debug: {
             level: 4
         },
-        components: ['core']
+        components: ['core', 'helpers']
     };
 
 }(window));

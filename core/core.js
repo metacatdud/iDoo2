@@ -13,6 +13,9 @@ window.Idoo = (function (iDooConfig) {
             component: {},
             container: {}
         },
+        Tools = {
+            build:{}
+        },
         Facade = {
             build: {}
         };
@@ -29,9 +32,17 @@ window.Idoo = (function (iDooConfig) {
      * Core component install - Install a new component
      * @param {Object} Component info
      */
-
     Core.component.install = function (name, body) {
-        console.log('Install::', name, body, 'INTO::', this);
+        var context;
+        
+        context = Object.copy({
+            name: this.name + '.' + name,
+            body: body
+        });
+        
+        Tools.build.toolbox(context);
+        
+        Core.container.setValueOf(this.name + '.' + name, body);
     };
 
     /**
@@ -45,6 +56,25 @@ window.Idoo = (function (iDooConfig) {
         console.log('Call::', name, 'as', type);
     }
 
+    /**
+     * -----------------------------------------------------------
+     *  Core internal tools for building and augmenting components
+     * -----------------------------------------------------------
+     */
+     
+     /**
+      * Tools box will be attached to component callback function
+      * @return {Object}
+      */
+     Tools.build.toolbox = function () {
+         console.log('Build toolbox for::', this);
+     };
+    
+     Tools.build.augments = function () {
+         console.log('Build augments for::', this);
+     };
+     
+     
     /**
      * Core facade handler
      * @constructor
@@ -79,7 +109,7 @@ window.Idoo = (function (iDooConfig) {
      */
     Facade.build = new Facade.instance();
     Facade.build.create();
-    console.log(Facade.build);
+window.comp = Core.container;
     return Facade.build.export;
 
 }(iDooConfig));
