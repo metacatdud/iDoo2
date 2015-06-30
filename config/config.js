@@ -14,7 +14,7 @@
         debug: {
             level: 4
         },
-        components: ['core', 'helpers']
+        components: ['core', 'helpers', 'libs', 'tools']
     };
 
 }(window));

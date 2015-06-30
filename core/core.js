@@ -4,17 +4,21 @@
  * @package core
  * @author Tibi
  * @version 0.1.0
+ * 
+ * //TODO - Add exception mechanism and validate this file instructions
  */
 
 window.Idoo = (function (iDooConfig) {
     'use strict';
 
     var Core = {
-            component: {},
-            container: {}
-        },
+        component: {},
+        container: {}
+    },
         Tools = {
-            build:{}
+            augmentables: {},
+            build: {},
+            toolbox: {}
         },
         Facade = {
             build: {}
@@ -30,31 +34,31 @@ window.Idoo = (function (iDooConfig) {
 
     /**
      * Core component install - Install a new component
-     * @param {Object} Component info
+     * @param object name
      */
     Core.component.install = function (name, body) {
-        var context;
-        
+        var context,
+            facade,
+            callee;
+
         context = Object.copy({
-            name: this.name + '.' + name,
-            body: body
+            namespace: this.name + '.' + name
         });
-        
+
         Tools.build.toolbox(context);
         
+        // Build internal lib for this component
+        facade = Tools.build.augments(context);
+        
+        // Store component to its corresponding container
         Core.container.setValueOf(this.name + '.' + name, body);
+        
+        // Call for execution immediately
+        callee = Core.container.getValueOf(this.name + '.' + name);
+        
+        // Shift component cb context to intall function level call
+        callee.call(context, facade);
     };
-
-    /**
-     * Core component request
-     *
-     * @param {String} component namespace
-     * @param {String} component receiving type static|instance
-     * @return {Object|Function}
-     */
-    Core.component.request = function (name, type) {
-        console.log('Call::', name, 'as', type);
-    }
 
     /**
      * -----------------------------------------------------------
@@ -62,26 +66,67 @@ window.Idoo = (function (iDooConfig) {
      * -----------------------------------------------------------
      */
      
-     /**
-      * Tools box will be attached to component callback function
-      * @return {Object}
-      */
-     Tools.build.toolbox = function () {
-         console.log('Build toolbox for::', this);
-     };
+    /**
+     * Toolbox will be attached to component callback function scope
+     * !!! Note that this will alter the reference
+     * 
+     * @param object context -  Context to create toolbox for
+     * @return void
+     */
+    Tools.build.toolbox = function (context) {
+        var i_toolbox;
+        console.log(context);
+        for (i_toolbox in Tools.toolbox) {
+            context.setValueOf(i_toolbox, Tools.toolbox[i_toolbox]);   
+        }
+    };
+
+    /**
+     * Augments will be attached to component callback function param
+     * 
+     * @param object context -  Context to create toolbox for
+     * @return void
+     */
+    Tools.build.augments = function (context) {
+        var augmentation = {
+            load: function (namespace, instance) {
+                if ('instance' === instance) {
+                    return Tools.augmentables.instance.call(context, namespace, instance);
+                } else {
+                    return Tools.augmentables.static.call(context, namespace, instance)
+                }
+            }
+        };
+
+        return augmentation;
+    };
+     
+    /**
+     * Augmentables handlers
+     *  - Instance - Instantiate a component for current conmonent scope
+     *  - Static - Receive a referince of the static object
+     * //TODO - Wrap this functionality
+     */
+    Tools.augmentables.instance = function (namespace) {
+        console.log('Instantiate component "' + namespace + '" for', this);
+    };
+
+    Tools.augmentables.static = function (namespace) {
+        console.log('Static component "' + namespace + '" for', this);
+    };
     
-     Tools.build.augments = function () {
-         console.log('Build augments for::', this);
-     };
-     
-     
+    /**
+     * Toolbox will augment caller scope with extra functionality
+     */
+    Tools.toolbox.install = function (component) {
+        console.log('Install', component, 'on behalf of', this);
+    };
+    
     /**
      * Core facade handler
      * @constructor
      */
-    Facade.instance = function () {
-
-    };
+    Facade.instance = function () { };
 
     /**
      * Create a facade instance for each component type
@@ -97,7 +142,15 @@ window.Idoo = (function (iDooConfig) {
             };
         }
     };
+    
+    /**
+     * Facade inject - Update current facade instance ref
+     * //TODO
+     */
+    Facade.instance.prototype.inject = function () {
 
+    };
+     
     /**
      * Export the facade for public use
      */
@@ -109,7 +162,9 @@ window.Idoo = (function (iDooConfig) {
      */
     Facade.build = new Facade.instance();
     Facade.build.create();
-window.comp = Core.container;
+
+    window.comp = Core.container;
+
     return Facade.build.export;
 
-}(iDooConfig));
+} (iDooConfig));

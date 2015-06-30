@@ -9,9 +9,14 @@
 (function () {
     'use strict';
 
-    Idoo.core.install('registry', function (){
+    Idoo.core.install('registry', function (I) {
 
-        console.log('registry body');
-
+        console.log('registry body scope', this, 'Internal lib::', I);
+        I.load('tools.console', 'instance'); 
+        
+        this.install({
+            test: 'lorem ipsum'
+        });  
+        
     });
 }());
