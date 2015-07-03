@@ -11,10 +11,11 @@
 
     window.iDooConfig = {
         version: '0.1.0',
+        components: ['app', 'core', 'helpers', 'libs', 'tools'],
         debug: {
             level: 4
         },
-        components: ['core', 'helpers', 'libs', 'tools']
+        env: 'dev'
     };
 
 }(window));
