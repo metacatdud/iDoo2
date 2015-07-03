@@ -8,163 +8,187 @@
  * //TODO - Add exception mechanism and validate this file instructions
  */
 
-window.Idoo = (function (iDooConfig) {
+window.iDoo = (function (iDooConfig) {
     'use strict';
 
     var Core = {
-        component: {},
         container: {}
     },
-        Tools = {
-            augmentables: {},
-            build: {},
-            toolbox: {}
+        CoreFacade = {},
+        Exposer = {
+            container: {},
+            instances: {}
         },
         Facade = {
-            build: {}
-        };
+            container: {},
+            instances: {}
+        },
+        Install;
 
     console.log('iDoo2 Core ver ' + iDooConfig.version);
 
     /**
      * --------------------------
      * CORE components handlers
+     * Install - Default function to add ability to install functionlities into components containers
+     * Exposer - Will expose iddo functionalities for further use
+     * Facade  - Will prepare components internal facades
      * --------------------------
      */
-
     /**
-     * Core component install - Install a new component
-     * @param object name
+     * Install - Install functionelity into 
      */
-    Core.component.install = function (name, body) {
+    Install = function (namespace, body) {
+
         var context,
             facade,
             callee;
 
         context = Object.copy({
-            namespace: this.name + '.' + name
+            namespace: this.component + '.' + namespace
         });
 
-        Tools.build.toolbox(context);
+        console.log('Install->', context);
         
-        // Build internal lib for this component
-        facade = Tools.build.augments(context);
+        // Add exposer
+        context.setValueOf('exposer', new Exposer.instance(context.namespace));
         
-        // Store component to its corresponding container
-        Core.container.setValueOf(this.name + '.' + name, body);
+        // Add facade
+        facade = new Facade.instance(context.namespace);
+        
+        // Store component
+        Core.container.setValueOf(context.namespace, body);
         
         // Call for execution immediately
-        callee = Core.container.getValueOf(this.name + '.' + name);
-        
-        // Shift component cb context to intall function level call
+        callee = Core.container.getValueOf(context.namespace);
+       
+        // Shift component cb context to install caller level scope
         callee.call(context, facade);
     };
-
+    
     /**
-     * -----------------------------------------------------------
-     *  Core internal tools for building and augmenting components
-     * -----------------------------------------------------------
+     * Exposer instance constructor
+     * @param string name - should have namespace.name
      */
+    Exposer.instance = function (namespace) {
+        this.namespace = namespace;
+         
+        // Store instance on creation
+        if (false === Exposer.instances.getValueOf(namespace, false)) {
+            Exposer.instances.setValueOf(namespace, this);
+        }
+    };
      
     /**
-     * Toolbox will be attached to component callback function scope
-     * !!! Note that this will alter the reference
+     * Add new functionalities to Idoo pubic object
+     * - Examples
+     *     iDoo.core.install
+     *     iDoo.core.something_1
+     *     iDoo.app.init
+     * @param function componentFunc - functionality to be apendet to newly created ns
+     * @return mixed true|Exception
      * 
-     * @param object context -  Context to create toolbox for
-     * @return void
+     * //TODO - Implement this thing
      */
-    Tools.build.toolbox = function (context) {
-        var i_toolbox;
-        console.log(context);
-        for (i_toolbox in Tools.toolbox) {
-            context.setValueOf(i_toolbox, Tools.toolbox[i_toolbox]);   
+    Exposer.instance.prototype.register = function (componentFunc) {
+        console.log('Add functionalties to component')
+    };
+     
+    /**
+     * Facade - Will prepare components for further use into new component facades
+     * @constructor
+     */
+    Facade.instance = function (namespace) {
+        this.namespace = namespace;
+         
+        // Store instance on creation
+        if (false === Facade.instances.getValueOf(namespace, false)) {
+            Facade.instances.setValueOf(namespace, this);
         }
     };
 
     /**
-     * Augments will be attached to component callback function param
-     * 
-     * @param object context -  Context to create toolbox for
-     * @return void
+     * Get a component as static
      */
-    Tools.build.augments = function (context) {
-        var augmentation = {
-            load: function (namespace, instance) {
-                if ('instance' === instance) {
-                    return Tools.augmentables.instance.call(context, namespace, instance);
-                } else {
-                    return Tools.augmentables.static.call(context, namespace, instance)
-                }
-            }
-        };
-
-        return augmentation;
-    };
-     
-    /**
-     * Augmentables handlers
-     *  - Instance - Instantiate a component for current conmonent scope
-     *  - Static - Receive a referince of the static object
-     * //TODO - Wrap this functionality
-     */
-    Tools.augmentables.instance = function (namespace) {
-        console.log('Instantiate component "' + namespace + '" for', this);
-    };
-
-    Tools.augmentables.static = function (namespace) {
-        console.log('Static component "' + namespace + '" for', this);
+    Facade.instance.prototype.require = function (componentNs) {
+        var facade = Facade.container.getValueOf(componentNs, false);
+        
+        if (false === facade) {
+            throw new Exception('BadFacadeException', 'Component-> [' + componentNs + '] does not exist', '1002');
+        }
+        
+        return facade;
     };
     
     /**
-     * Toolbox will augment caller scope with extra functionality
+     * Get a component as instance
+     * 
+     * // TODO - validate consistency
      */
-    Tools.toolbox.install = function (component) {
-        console.log('Install', component, 'on behalf of', this);
+    Facade.instance.prototype.instance = function (componentNs) {
+        var facade = Facade.container.getValueOf(componentNs, false);
+        
+        if (false === facade) {
+            throw new Exception('BadFacadeException', 'Component-> [' + componentNs + '] does not exist', '1002');
+        }
+
+        if ('function' !== typeof facade) {
+            throw new Exception('BadFacadeException', 'Component-> [' + componentNs + '] should be a function to be instatiated', '1003');
+        }
+        
+        return new facade(this.namespace);
+    };
+    
+    /**
+     * Register a component facade for next components to use
+     * 
+     * // TODO - validate consistency
+     */
+    Facade.instance.prototype.register = function (componentFacade) {
+        var newFacade = Facade.container.getValueOf(this.namespace, false);
+        
+        if (false === newFacade) {
+            Facade.container.setValueOf(this.namespace, componentFacade);
+        } else {
+            throw new Exception('FacadeRegisterException', 'Facade-> [' + this.namespace + '] is already registered');
+        }
     };
     
     /**
      * Core facade handler
      * @constructor
      */
-    Facade.instance = function () { };
+    CoreFacade.instance = function () { };
 
     /**
-     * Create a facade instance for each component type
+     * defaults - Create a facade instance for each component type
      */
-    Facade.instance.prototype.create = function () {
+    CoreFacade.instance.prototype.defaults = function () {
         var i_comp;
 
         for (i_comp = 0; i_comp < iDooConfig.components.length; i_comp += 1) {
             this.export[iDooConfig.components[i_comp]] = {
-                install: Core.component.install,
-                request: Core.component.request,
-                name: iDooConfig.components[i_comp]
+                install: Install,
+                component: iDooConfig.components[i_comp]
             };
         }
     };
     
     /**
-     * Facade inject - Update current facade instance ref
-     * //TODO
-     */
-    Facade.instance.prototype.inject = function () {
-
-    };
-     
-    /**
      * Export the facade for public use
      */
-    Facade.instance.prototype.export = {};
-
+    CoreFacade.instance.prototype.export = {};
 
     /**
      * Run facade creation and export
      */
-    Facade.build = new Facade.instance();
-    Facade.build.create();
+    CoreFacade.build = new CoreFacade.instance();
+    CoreFacade.build.defaults();
 
     window.comp = Core.container;
+    window.facade = Facade;
+    window.expose = Exposer;
 
-    return Facade.build.export;
+    return CoreFacade.build.export;
 
 } (iDooConfig));
