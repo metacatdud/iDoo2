@@ -9,19 +9,12 @@
 (function () {
     'use strict';
 
-	iDoo.libs.install('events', function (I) {
-		var console = I.instance('tools.console'),
-			reg = I.require('core.registry');
-		
-		
-		reg.set('test', '[test] -> Simple key setup');
-		reg.set('complex.test', '[complex.test] -> complex key setup');
-		reg.set('complex.obj', {test: '[complex.obj] -> complex obj'});
-		
-		console.log(reg.get('test'));
-		console.log(reg.get('complex.test'));
-		console.log(reg.get('complex.obj'));
-		console.log('Test');
+	iDoo.libs.install('events.Dispatcher', function (I) {
+		var console,
+			reg;
+
+		console = I.instance('tools.console');
+		reg = I.require('core.registry');
+
 	});
-	
 } ());
