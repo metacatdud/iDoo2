@@ -20,11 +20,11 @@
 	
 	var Demo = new iDoo.app({
 		entrypoint: 'home.index',
+		htmlNode: 'demo-app',
 		load: 'async',
 		serverURL: '//localhost/demo-app',
 		version: '0.1.0'	
 	});
 	
-	console.log(Demo);
-	
+	Demo.boot();
 } ());
