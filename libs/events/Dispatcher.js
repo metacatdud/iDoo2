@@ -30,12 +30,14 @@
                 persistent: true  
             };
             
-            console.debug(header.sortProperties())
-            
-            if ('string' !== typeof header) {
-                throw new Exception('BadEventHeaderException', 'Event header should be a string, ' + typeof header + ' was provided');
+            if ('object' !== typeof header) {
+                throw new Exception('BadEventHeaderException', 'Event header should be a object, ' + typeof header + ' was provided');
             }
-
+            
+            if (undefined === header.module) {
+                throw new Exception('BadEventHeaderException', 'Event header -> module property is missing');
+            }
+            
             if ('function' !== typeof body) {
                 throw new Exception('BadEventHeaderException', 'Event "' + header + '" should be a function, ' + typeof body + 'was provided');
             }
@@ -44,14 +46,20 @@
                 event.updateValueOf('persistent', false);
             }
             
+            
             /**
              * Construct the rest of the event body
              */
-            event.setValueOf('module', context.namespace);
-            event.setValueOf('action', header);
+            event.setValueOf('container', context.namespace)
+            event.setValueOf('module', header.module);
+            
+            if (undefined !== header.action && 'string' === typeof header.action) {
+                event.setValueOf('action', header.action);
+            }
+            
             event.setValueOf('body', body);
             
-            console.debug(event);
+            console.debug('Parsed event:::', event);
          };
          
          /**
@@ -73,6 +81,10 @@
                 throw new Exception('EventsSetupException', 'Namespace name should be a string, ' + typeof EventInstance.namespace + ' was provided');
             }
 
+            if (-1 !== EventInstance.namespace.indexOf('.')) {
+                throw new Exception('EventsSetupException', 'Namespace "' + EventInstance.namespace + '" contains illegal characters "." ');
+            }
+            
             if (false !== EventBus.container.getValueOf(EventInstance.namespace, false)) {
                 throw new Exception('EventsSetupException', 'Namespace "' + EventInstance.namespace + '" is already registered');
             }

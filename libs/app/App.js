@@ -18,16 +18,18 @@
 			container: {},
 			entity: {}
 		},
+			AppEvent,
 			console,
 			DOM,
-			Event,
+			EventInstance,
 			registry;
 
 		// Dependencies	
 		console = I.instance('tools.console');
 		registry = I.require('core.registry');
 		DOM = I.require('helpers.selector');
-		Event = I.instance('libs.events.Dispatcher');
+		EventInstance = I.require('libs.events.Dispatcher');
+		AppEvent = new EventInstance('App');
 		
 		/**
 		 * Will instantiate a new application handler
@@ -124,7 +126,7 @@
 		 * @event
 		* Register entity
 		*/
-		Event.listen({
+		AppEvent.listen({
 			module: 'entity',
 			action: 'register'
 		}, App.entity.register);
