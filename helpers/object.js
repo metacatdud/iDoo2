@@ -298,4 +298,33 @@
             throw new Error("Unable to copy obj! Its type isn't supported.");
         }
     });
+    
+    Object.defineProperty(Object.prototype, 'sortProperties', {
+        value: function () {
+            var sorted = {},
+                keys = [], 
+                i, 
+                k, 
+                len;
+            
+            for (k in this)
+            {
+                if (this.hasOwnProperty(k))
+                {
+                    keys.push(k);
+                }
+            }
+
+            keys.sort();
+            len = keys.length;
+
+            for (i = 0; i < len; i++)
+            {
+                k = keys[i];
+                sorted.setValueOf(k, this[k]);
+            }
+            
+            return sorted;
+        }
+    });
 }());

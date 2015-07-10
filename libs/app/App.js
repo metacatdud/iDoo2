@@ -14,23 +14,26 @@
 		/**
 		 * iDoo App main instance
 		 */
-		var App,
+		var App = {
+			container: {},
+			entity: {}
+		},
 			console,
 			DOM,
 			Event,
 			registry;
 
+		// Dependencies	
 		console = I.instance('tools.console');
 		registry = I.require('core.registry');
 		DOM = I.require('helpers.selector');
-				
 		Event = I.instance('libs.events.Dispatcher');
 		
 		/**
 		 * Will instantiate a new application handler
 		 * @constructor
 		 */
-		App = function (config) {
+		App.instance = function (config) {
 			this.options = {
 				entrypoint: false,
 				htmlNode: false,
@@ -84,35 +87,58 @@
 			} else {
 				this.options.updateValueOf('htmlNode', config.htmlNode);
 			}
+			
+			// Add the rest of configs
+			this.options.expand(config);
 
 		};
 		
 		/**
-		 * Init applicaiton. Load entrypoint
+		 * Init applicaiton.
+		 *  - Store instance 
+		 *  - Load entrypoint
 		 */
-		App.prototype.boot = function (options) {
-			var options = this.options;
-			document.addEventListener("DOMContentLoaded", function (event) {
-				//Move extra checks into a static area of this component
-				//new DOM('[data-app="' + options.htmlNode + '"')
-			});
+		App.instance.prototype.boot = function (options) {
+			App.updateValueOf('container', this);
+			
+			//document.addEventListener("DOMContentLoaded", function (event) {
+			//Move extra checks into a static area of this component
+			//new DOM('[data-app="' + options.htmlNode + '"')
+			//});
 		};
 		
 		/**
 		 * Attach custom events
 		 */
-		App.prototype.event = {};
+		App.instance.prototype.event = 'test';
+		
+		/**
+		 * App entity registry handler
+		 */
+		 App.entity.register = function(entity) {
+			 console.log('Regsiter', entity);
+		 };
+		 
+ 
+		/**
+		 * @event
+		* Register entity
+		*/
+		Event.listen({
+			module: 'entity',
+			action: 'register'
+		}, App.entity.register);
 		
 		/**
 		 * //
 		 */
-		
+
 		/**
 		 * Mount this into iDoo CORE
 		 */
 		this.exposer.register({
 			namespace: 'app',
-			body: App
+			body: App.instance
 		});
 	});
 
