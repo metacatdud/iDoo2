@@ -13,7 +13,8 @@
 		var EventBus = {
 			container: {},
             queue: {},
-            temporary: []
+            temporary: [],
+            types: ['action', 'shout', 'chain', 'to']
 		},
 			Event = {},
 			console,
@@ -33,11 +34,7 @@
             if ('object' !== typeof header) {
                 throw new Exception('BadEventHeaderException', 'Event header should be a object, ' + typeof header + ' was provided');
             }
-            
-            if (undefined === header.module) {
-                throw new Exception('BadEventHeaderException', 'Event header -> module property is missing');
-            }
-            
+                        
             if ('function' !== typeof body) {
                 throw new Exception('BadEventHeaderException', 'Event "' + header + '" should be a function, ' + typeof body + 'was provided');
             }
@@ -50,8 +47,7 @@
             /**
              * Construct the rest of the event body
              */
-            event.setValueOf('container', context.namespace)
-            event.setValueOf('module', header.module);
+            event.setValueOf('namespace', context.namespace);
             
             if (undefined !== header.action && 'string' === typeof header.action) {
                 event.setValueOf('action', header.action);
@@ -60,17 +56,93 @@
             event.setValueOf('body', body);
             
             console.debug('Parsed event:::', event);
+            
+            /**
+             * If event is temporary put it into temporary array queue to be removed after first call
+             */
+            if (false === event.persistent) {
+                EventBus.temporary.push(context.namespace + '.' + event.action);
+            }
+            
+            EventBus.container.setValueOf(context.namespace + '.' + event.action, event.body);
          };
          
          /**
           * dispatch - Will dispatch a message to an event listener 
           */
-         EventBus.dispatch = {};
+         EventBus.dispatch = function (context, header, body) {
+             var event = {
+                type: {}
+            };
+
+            if ('object' !== typeof header) {
+                throw new Exception('EventDispatcherException', 'Event dispatcher header should be object, ' + typeof header + ' was provided');
+            }
+
+            if (undefined === header.namespace) {
+                event.setValueOf('namespace', context.namespace);
+            } else {
+                event.setValueOf('namespace', header.namespace);
+            }
+
+            if (undefined === header.type) {
+                //Throw
+                console.log('Header type undefined');
+            } else {
+                if(-1 === EventBus.types.indexOf(header.type)) {
+                    //Throw
+                    console.log('Header type not in list');
+                }
+                event.updateValueOf('type', header.type);
+                
+                //TODO - handle all posibilities
+                event.setValueOf('action', header.action);
+            }
+
+            if (undefined !== body) {
+                event.setValueOf('body', body);
+            }
+            
+            console.debug('Exec ', event);
+            this.exec(event);
+         };
          
          /**
           * exec - Execute a dispatch
           */
-         EventBus.exec = {};
+         EventBus.exec = function (event) {
+            var actionIsPersistent,
+                dispatchCb,
+                targetContainer;
+            
+            targetContainer =  EventBus.container.getValueOf(event.namespace);
+            
+            //TODO - Handle other types
+            if ('action' === event.type) {
+                actionIsPersistent = (-1 !== EventBus.temporary.indexOf(event.namespace + '.' + event.action) ? false : true);
+                dispatchCb = EventBus.container.getValueOf(event.namespace + '.' + event.action, false);
+                
+                /**
+                 * Unset listener if it's a temp
+                 */
+                if (false === actionIsPersistent) {
+                    EventBus.temporary.splice(EventBus.temporary.indexOf(event.namespace + '.' + event.action), 1);
+                    EventBus.container.unsetValueOf(event.namespace + '.' + event.action);
+                }
+
+                /**
+                 * If no more listeners into module, remove module object also
+                 */
+                if (undefined !==  targetContainer && 0 === Object.getOwnPropertyNames(targetContainer).length) {
+                    EventBus.container.unsetValueOf(event.namespace);
+                }
+                
+                if(undefined !== dispatchCb && 'function' === typeof dispatchCb) {    
+                    dispatchCb(event.body);
+                }
+            }        
+                 
+         };
          
 		/**
 		 * setupNamespace - EventBus will agregate all the events throughout the system
@@ -100,7 +172,8 @@
 		  * @param string namespace
 		  */
 		Event.instance = function (namespace) {
-			this.namespace = namespace.replace(/\./g, "-");;
+			this.namespace = namespace; 
+            //namespace.replace(/\./g, "-");
             EventBus.setupNamespace(this);
 		};	  
 		
@@ -132,7 +205,7 @@
         Event.instance.prototype.destroy = function () {
 
         };
-		
+		window.EventBus = EventBus;
 		I.register(Event.instance);
 	});
 } ());

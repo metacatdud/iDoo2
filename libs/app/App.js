@@ -117,19 +117,42 @@
 		/**
 		 * App entity registry handler
 		 */
-		 App.entity.register = function(entity) {
-			 console.log('Regsiter', entity);
-		 };
+		App.entity.register = function (entity) {
+			console.log('Regsiter', entity);
+		};
 		 
  
-		/**
-		 * @event
+	   /**
+	 	* @event
 		* Register entity
 		*/
-		AppEvent.listen({
-			module: 'entity',
-			action: 'register'
+		AppEvent.listenOnce({
+			action: 'entity-register'
 		}, App.entity.register);
+		
+		
+		AppEvent.dispatch({
+			namespace: 'App',
+			type: 'action',
+			action: 'entity-register'
+		}, {a: 1, b: 2, c: 'Lorem ipsum'});
+		
+		
+		AppEvent.listen({
+			action: 'entity-register'
+		}, App.entity.register);
+		
+		AppEvent.dispatch({
+			namespace: 'App',
+			type: 'action',
+			action: 'entity-register'
+		}, {a: 1, b: 2, c: 'persistent 1'});
+		
+		AppEvent.dispatch({
+			namespace: 'App',
+			type: 'action',
+			action: 'entity-register'
+		}, {a: 1, b: 2, c: 'persistent 2'});
 		
 		/**
 		 * //
