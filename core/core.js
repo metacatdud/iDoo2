@@ -47,8 +47,6 @@ window.iDoo = (function (iDooConfig) {
         context = Object.copy({
             namespace: this.component + '.' + namespace
         });
-
-        console.log('Install->', context);
         
         // Add exposer
         context.setValueOf('exposer', new Exposer.instance(context.namespace));
