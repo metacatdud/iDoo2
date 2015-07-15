@@ -26,11 +26,17 @@
 		registry = I.require('core.registry');
 		EventInstance = I.require('libs.events.Dispatcher');
 		Event = new EventInstance('Entity');
-			
+		
+		/**
+		 * @constructor
+		 */
 		Entity.instance = function (name) {
 			this.name = name;
 		};
 		
+		/**
+		 * Define an action fot entity
+		 */
 		Entity.instance.prototype.action = function (header, body) {
 			var entity = {};
 			
@@ -45,6 +51,9 @@
 			}, entity);
 		};
 		
+		/**
+		 * Define an event fot entity
+		 */
 		Entity.instance.prototype.event = function (header, body) {
 			var entity = {};
 			
