@@ -34,7 +34,9 @@
 		 * @return {Console.log} any
 		 */
 		Console.instance.prototype.log = function () {
-			console.log.apply(console, ['[' + this.name + ']::'].concat(Array.prototype.slice.call(arguments, 0)));
+			if ('dev' === iDooConfig.env && 2 <= iDooConfig.debug.level) {
+				console.log.apply(console, ['[' + this.name + ']::'].concat(Array.prototype.slice.call(arguments, 0)));
+			}
 		};
         
         /**
@@ -43,7 +45,9 @@
 		 * @return {Console.warn} any
 		 */
 		Console.instance.prototype.warn = function () {
-			console.warn.apply(console, ['[' + this.name + ']::'].concat(Array.prototype.slice.call(arguments, 0)));
+			if ('dev' === iDooConfig.env && 3 <= iDooConfig.debug.level) {
+				console.warn.apply(console, ['[' + this.name + ']::'].concat(Array.prototype.slice.call(arguments, 0)));
+			}
 		};
 		
 		/**
@@ -61,7 +65,9 @@
 		 * @return {Console.debug} any
 		 */
 		Console.instance.prototype.debug = function () {
-			console.debug.apply(console, ['[' + this.name + ']::'].concat(Array.prototype.slice.call(arguments, 0)));
+			if ('dev' === iDooConfig.env && 4 === iDooConfig.debug.level) {
+				console.debug.apply(console, ['[' + this.name + ']::'].concat(Array.prototype.slice.call(arguments, 0)));
+			}
 		};
         
         /**
