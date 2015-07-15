@@ -27,7 +27,8 @@
 		// Dependencies	
 		console = I.instance('tools.console');
 		registry = I.require('core.registry');
-		DOM = I.require('helpers.selector');
+		
+		DOM = I.require('libs.html.Selector');
 		EventInstance = I.require('libs.events.Dispatcher');
 		AppEvent = new EventInstance('App');
 		
@@ -37,7 +38,7 @@
 		 */
 		App.instance = function (config) {
 			this.options = {
-				entrypoint: false,
+				entryPoint: false,
 				htmlNode: false,
 				load: 'sync',
 				serverURL: false,
@@ -72,14 +73,14 @@
 				}
 			}
 
-			if (false === this.options.entrypoint) {
-				if (undefined === config.entrypoint) {
+			if (false === this.options.entryPoint) {
+				if (undefined === config.entryPoint) {
 					throw new Exception('AppConfigException', 'Param "seentrypointrverURL" is not provided');
 				} else {
-					if ('string' !== typeof config.entrypoint) {
-						throw new Exception('AppConfigException', 'Param "entrypoint" should be a string, ' + typeof config.entrypoint + ' provided');
+					if ('string' !== typeof config.entryPoint) {
+						throw new Exception('AppConfigException', 'Param "entrypoint" should be a string, ' + typeof config.entryPoint + ' provided');
 					} else {
-						this.options.updateValueOf('entrypoint', config.entrypoint);
+						this.options.updateValueOf('entrypoint', config.entryPoint);
 					}
 				}
 			}
@@ -100,64 +101,75 @@
 		 *  - Store instance 
 		 *  - Load entrypoint
 		 */
-		App.instance.prototype.boot = function (options) {
+		App.instance.prototype.boot = function () {
+			
 			App.updateValueOf('container', this);
 			
-			//document.addEventListener("DOMContentLoaded", function (event) {
-			//Move extra checks into a static area of this component
-			//new DOM('[data-app="' + options.htmlNode + '"')
-			//});
+			// Save main app element when DOM Ready!
+			document.addEventListener('DOMContentLoaded', function (event) {
+				console.info('Register main HTML node');
+				DOM.instance('app', App.container.options.htmlNode);
+				
+				AppEvent.dispatch({
+					type: 'action',
+					action: 'dom-ready'
+				});
+			});
 		};
-		
+				
 		/**
-		 * Attach custom events
-		 */
-		App.instance.prototype.event = 'test';
-		
-		/**
+		 * @event listener
 		 * App entity registry handler
 		 */
 		App.entity.register = function (entity) {
 			console.log('Regsiter', entity);
 		};
+		
+		/**
+		 * @event listener
+		 * Page DOM ready
+		 */
+		App.domReady = function () {
+			console.info('DOM loaded. Boot app');
+			
+			AppEvent.dispatch({
+				type: 'action',
+				action: 'app-ready'
+			})	
+		};
+		
+		/**
+		 * @event listener
+		 * App ready
+		 */
+		App.ready = function () {
+			console.info('!!! BOOT !!!');	
+		};
 		 
- 
-	   /**
-	 	* @event
-		* Register entity
-		*/
-		AppEvent.listenOnce({
-			action: 'entity-register'
-		}, App.entity.register);
-		
-		
-		AppEvent.dispatch({
-			namespace: 'App',
-			type: 'action',
-			action: 'entity-register'
-		}, {a: 1, b: 2, c: 'Lorem ipsum'});
-		
-		
+	   	/**
+	 	 * @event
+		 * Register entity
+		 */
 		AppEvent.listen({
 			action: 'entity-register'
 		}, App.entity.register);
 		
-		AppEvent.dispatch({
-			namespace: 'App',
-			type: 'action',
-			action: 'entity-register'
-		}, {a: 1, b: 2, c: 'persistent 1'});
-		
-		AppEvent.dispatch({
-			namespace: 'App',
-			type: 'action',
-			action: 'entity-register'
-		}, {a: 1, b: 2, c: 'persistent 2'});
+		/**
+		 * @event
+		 * App page DOM loaded
+		 */
+	 	AppEvent.listen({
+			action: 'dom-ready'
+		}, App.domReady);
 		
 		/**
-		 * //
+		 * @event
+		 * App boot when everything is ready
 		 */
-
+	 	AppEvent.listen({
+			action: 'app-ready'
+		}, App.ready);
+		
 		/**
 		 * Mount this into iDoo CORE
 		 */

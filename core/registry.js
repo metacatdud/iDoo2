@@ -83,5 +83,6 @@
         };
         
         I.register(Registry.facade);
+        window.reg = Registry.container;
     });
 } ());

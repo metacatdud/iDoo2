@@ -19,10 +19,9 @@
 (function () {
 	
 	var Demo = new iDoo.app({
-		entrypoint: 'home.index',
+		entryPoint: 'home.index',
 		htmlNode: 'demo-app',
-		load: 'async',
-		serverURL: '//localhost/demo-app',
+		load: 'sync',
 		version: '0.1.0'	
 	});
 	

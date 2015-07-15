@@ -4,6 +4,8 @@
  * @package libs/events
  * @author Tibi
  * @version 0.1.0
+ * 
+ * //TODO - Add documentation
  */
 
 (function () {
@@ -55,8 +57,6 @@
             
             event.setValueOf('body', body);
             
-            console.debug('Parsed event:::', event);
-            
             /**
              * If event is temporary put it into temporary array queue to be removed after first call
              */
@@ -71,7 +71,7 @@
           * dispatch - Will dispatch a message to an event listener 
           */
          EventBus.dispatch = function (context, header, body) {
-             var event = {
+            var event = {
                 type: {}
             };
 
@@ -86,12 +86,10 @@
             }
 
             if (undefined === header.type) {
-                //Throw
-                console.log('Header type undefined');
+                throw new Exception('EventDispatcherException', 'Event dispatcher header type was not specified');
             } else {
                 if(-1 === EventBus.types.indexOf(header.type)) {
-                    //Throw
-                    console.log('Header type not in list');
+                    throw new Exception('EventDispatcherException', 'Event dispatcher header type is not known. Available types: [' + EventBus.types.join(',') + ']' );
                 }
                 event.updateValueOf('type', header.type);
                 
@@ -109,13 +107,15 @@
          
          /**
           * exec - Execute a dispatch
+          * @param object event
+          * @return void
           */
          EventBus.exec = function (event) {
             var actionIsPersistent,
                 dispatchCb,
                 targetContainer;
             
-            targetContainer =  EventBus.container.getValueOf(event.namespace);
+            targetContainer =  EventBus.container.getValueOf(event.namespace, false);
             
             //TODO - Handle other types
             if ('action' === event.type) {
@@ -129,21 +129,46 @@
                     EventBus.temporary.splice(EventBus.temporary.indexOf(event.namespace + '.' + event.action), 1);
                     EventBus.container.unsetValueOf(event.namespace + '.' + event.action);
                 }
-
-                /**
-                 * If no more listeners into module, remove module object also
-                 */
-                if (undefined !==  targetContainer && 0 === Object.getOwnPropertyNames(targetContainer).length) {
-                    EventBus.container.unsetValueOf(event.namespace);
-                }
                 
-                if(undefined !== dispatchCb && 'function' === typeof dispatchCb) {    
+                if(false !== dispatchCb && 'function' === typeof dispatchCb) {    
                     dispatchCb(event.body);
+                } else {
+                    console.debug('Callback does not exist! Either entire stack for namespace was removed or action is not valid! [EVENT]::', event);
                 }
             }        
                  
          };
          
+         /**
+          * Remove an event listener form a stack
+          * @param object header - Event header
+          * @return hoid
+          */
+         EventBus.remove = function(context, header) {
+            var event = {};
+             
+            if (undefined === header.namespace) {
+                event.setValueOf('namespace', context.namespace);
+            } else {
+                event.setValueOf('namespace', header.namespace);
+            }
+            event.setValueOf('action', header.action);
+             
+            EventBus.container.unsetValueOf(event.namespace + '.' + event.action);
+         };
+         
+        /**
+         * Remove a stack of a namesapce. Events of that module will no longer be available
+         */
+        EventBus.destroy = function (context) {
+            var targetContainer;
+            
+            targetContainer = EventBus.container.getValueOf(context.namespace, false);
+            if (false !==  targetContainer) {
+                EventBus.container.unsetValueOf(context.namespace);
+            }
+        };
+        
 		/**
 		 * setupNamespace - EventBus will agregate all the events throughout the system
 		 */
@@ -163,7 +188,6 @@
             
             EventBus.container.setValueOf(EventInstance.namespace, {});
 		 };
-		 
 		 
 		 /**
 		  * Event - main event controller. Will create a private stack for every instance
@@ -185,7 +209,7 @@
         };
 
         /**
-         * Listen once and destroy
+         * Listen once and delete this listener
          */
         Event.instance.prototype.listenOnce = function (header, body) {
             EventBus.create(this, header, body, false);
@@ -197,15 +221,21 @@
         Event.instance.prototype.dispatch = function (header, body) {
             EventBus.dispatch(this, header, body);
         };
-
+        
+        /**
+         * Delete a listener
+         */
+        Event.instance.prototype.remove = function (header) {
+            EventBus.destroy(this, header);
+        };
+        
         /**
          * Destroy
-         * TODO
          */
         Event.instance.prototype.destroy = function () {
-
+            EventBus.destroy(this);
         };
-		window.EventBus = EventBus;
+		
 		I.register(Event.instance);
 	});
 } ());
