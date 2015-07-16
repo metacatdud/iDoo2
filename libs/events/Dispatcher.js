@@ -101,7 +101,6 @@
                 event.setValueOf('body', body);
             }
             
-            console.debug('Exec ', event);
             this.exec(event);
          };
          
