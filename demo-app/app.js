@@ -22,6 +22,7 @@
 		entryPoint: 'home.index',
 		htmlNode: 'demo-app',
 		load: 'sync',
+		loadList: ['home', 'other'],
 		version: '0.1.0'	
 	});
 	
