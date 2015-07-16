@@ -24,8 +24,6 @@
 		registry = I.require('core.registry');
 		console = I.instance('tools.console');
 		
-
-
 		/**
 		 * Init new dom container
 		 */
