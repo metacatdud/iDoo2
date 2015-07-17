@@ -17,15 +17,15 @@
 			instance: {}
 		},
 			console,
-			registry,
-			DOM,
+			Context,
 			EventInstance,
 			Event;
 		
 		// Dependencies	
 		console = I.instance('tools.console');
-		registry = I.require('core.registry');
-		DOM = I.require('libs.html.Selector');
+
+		Context = I.require('libs.app.Context');
+
 		EventInstance = I.require('libs.events.Dispatcher');
 		Event = new EventInstance('Entity');
 		
@@ -34,7 +34,9 @@
 		 */
 		Entity.instance = function (name) {
 			this.name = name;
-			
+
+			this.context = new Context(this.name);
+
 			Event.dispatch({
 				namespace: 'App',
 				type: 'action',
@@ -46,19 +48,14 @@
 		 * Define an action fot entity
 		 */
 		Entity.instance.prototype.action = function (header, body) {
-			var entity = {},
-				context;
-			
-			context = {
+			var entity;
+
+			entity = {
 				name: this.name,
 				header: header,
 				type: 'action'	
 			};
-			
-			context.setValueOf('DOM', DOM);
-			
-			entity = Object.copy(context);
-			entity.setValueOf('body', body.bind(context));
+			entity.setValueOf('body', body.bind(this.context));
 			
 			Event.dispatch({
 				namespace: 'App',
@@ -71,19 +68,15 @@
 		 * Define an event fot entity
 		 */
 		Entity.instance.prototype.event = function (header, body) {
-			var entity = {},
-				context;
-			
-			context = {
+			var entity;
+
+			entity = {
 				name: this.name,
 				header: header,
 				type: 'event'	
 			};
 			
-			context.setValueOf('DOM', DOM);
-			
-			entity = Object.copy(context);
-			entity.setValueOf('body', body.bind(context));
+			entity.setValueOf('body', body.bind(this.context));
 			
 			Event.dispatch({
 				namespace: 'App',

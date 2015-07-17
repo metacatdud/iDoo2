@@ -15,7 +15,9 @@
 	 
 	 // Actions
 	 Home.action('index', function() {
-		this.DOM.get('app').innerHTML = '<p> THIS IS THE HOME PAGE!</p>';	
+
+		console.log(Home);
+		//this.DOM.get('app').innerHTML = '<p> THIS IS THE HOME PAGE!</p>';
 	 });
 	 
 	 Home.action('other', function() {
