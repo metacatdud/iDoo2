@@ -27,8 +27,9 @@
 
 		// Dependencies	
 		console = I.instance('tools.console');
-		registry = I.require('core.registry');
-		
+		registry = I.instance('core.registry');
+
+
 		DOM = I.require('libs.html.Selector');
 		EventInstance = I.require('libs.events.Dispatcher');
 		AppEvent = new EventInstance('App');
