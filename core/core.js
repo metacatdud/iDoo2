@@ -144,17 +144,22 @@ window.iDoo = (function (iDooConfig) {
      * // TODO - validate consistency
      */
     Facade.instance.prototype.instance = function (componentNs) {
-        var facade = Facade.container.getValueOf(componentNs, false);
+        var facade = Facade.container.getValueOf(componentNs, false),
+            output;
 
         if (false === facade) {
             throw new Exception('BadFacadeException', 'Component-> [' + componentNs + '] does not exist', '1002');
         }
 
-        if ('function' !== typeof facade) {
-            throw new Exception('BadFacadeException', 'Component-> [' + componentNs + '] should be a function to be instatiated', '1003');
+        if ('function' === typeof facade) {
+            return new facade(this.namespace);
+        } else {
+            if ('object' === typeof facade && false !== facade.getValueOf('instance')) {
+                return new facade.instance(this.namespace);
+            } else {
+                throw new Exception('BadFacadeException', 'Component-> [' + componentNs + '] should be a function to be instatiated', '1003');
+            }
         }
-
-        return new facade(this.namespace);
     };
     
     /**
