@@ -16,8 +16,10 @@
          */
         var Registry = {
             container: {},
+            static: {},
             facade: {}
         };
+
         
         /**
          * Set a key value pait to registry
@@ -26,14 +28,20 @@
          * @param {Any} value
          * @return {any|throw} value
          */
-        Registry.set = function (key, value) {
-            var registryEntry = this.container.getValueOf(key, false);
+        Registry.static.set = function (key, value) {
+            var registryEntry;
+
+            if (true === this instanceof Registry.instance) {
+                key = this.key + '.' + key
+            }
+
+            registryEntry = Registry.container.getValueOf(key, false);
 
             if (false !== registryEntry) {
                 throw new Exception('RegistryException', 'Key ' + key + ' is already registered', 'idoo200');
             }
 
-            this.container.setValueOf(key, value);
+            Registry.container.setValueOf(key, value);
         };
         
         /**
@@ -41,8 +49,14 @@
          * @param {String} key
          * @return {MIxed} value of the key or false if nothing found
          */
-        Registry.get = function (key) {
-            var registryEntry = this.container.getValueOf(key, false);
+        Registry.static.get = function (key) {
+            var registryEntry;
+
+            if (true === this instanceof Registry.instance) {
+                key = this.key + '.' + key
+            }
+
+            registryEntry = Registry.container.getValueOf(key, false);
 
             if (false === registryEntry) {
                 return false;
@@ -56,30 +70,50 @@
          * @param {String} key
          * @return {Boolean}
          */
-        Registry.delete = function (key) {
-            var registryEntry = this.container.getValueOf(key, false);
+        Registry.static.delete = function (key) {
+            var registryEntry;
+
+            if (true === this instanceof Registry.instance) {
+                key = this.key + '.' + key
+            }
+
+            registryEntry = Registry.container.getValueOf(key, false);
 
             if (false === registryEntry) {
                 return false;
             }
 
-            this.container.unsetValueOf(key);
+            Registry.container.unsetValueOf(key);
             return true;
         };
+
+        /**
+         * @constructor
+         * Instantiate registry for private storage
+         */
+        Registry.instance = function () {
+            this.key = I.require('tools.generator').keygen();
+        };
+
+        /**
+         * Copy main object proto to instance
+         */
+        Registry.instance.prototype = Object.create(Registry.static);
         
         /**
          * Registry facade
          */
         Registry.facade = {
             get: function (key) {
-                return Registry.get(key);
+                return Registry.static.get(key);
             },
             set: function (key, value) {
-                return Registry.set(key, value);
+                return Registry.static.set(key, value);
             },
             delete: function (key) {
-                return Registry.delete(key);
-            }
+                return Registry.static.delete(key);
+            },
+            instance: Registry.instance
         };
         
         I.register(Registry.facade);
