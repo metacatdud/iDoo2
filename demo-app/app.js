@@ -18,7 +18,7 @@
  */
 (function () {
 	
-	var Demo = new iDoo.app({
+	var Demo = new iDoo.App({
 		entryPoint: 'home.index',
 		htmlNode: 'demo-app',
 		load: 'sync',

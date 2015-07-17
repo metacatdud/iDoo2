@@ -36,7 +36,7 @@
             }
                         
             if ('function' !== typeof body) {
-                throw new Exception('BadEventHeaderException', 'Event "' + header + '" should be a function, ' + typeof body + 'was provided');
+                throw new Exception('BadEventHeaderException', 'Event "' + header + '" should be a function, ' + typeof body + ' was provided');
             }
 
             if (undefined !== persistent && false === persistent) {

@@ -4,6 +4,8 @@
  * @package libs/app
  * @author Tibi
  * @version 0.1.0
+ *
+ * TODO - Redesign architecture pattern Entity -> Component -> App
  */
 
 (function () {
@@ -31,7 +33,7 @@
 
 
 		DOM = I.require('libs.html.Selector');
-		EventInstance = I.require('libs.events.Dispatcher');
+                    EventInstance = I.require('libs.events.Dispatcher');
 		AppEvent = new EventInstance('App');
 		
 		/**
@@ -79,10 +81,10 @@
 				
 			if (false === this.options.entryPoint) {
 				if (undefined === config.entryPoint) {
-					throw new Exception('AppConfigException', 'Param "seentrypointrverURL" is not provided');
+					throw new Exception('AppConfigException', 'Param "entryPoint" is not provided');
 				} else {
 					if ('string' !== typeof config.entryPoint) {
-						throw new Exception('AppConfigException', 'Param "entrypoint" should be a string, ' + typeof config.entryPoint + ' provided');
+						throw new Exception('AppConfigException', 'Param "entryPoint" should be a string, ' + typeof config.entryPoint + ' provided');
 					} else {
 						this.options.updateValueOf('entryPoint', config.entryPoint);
 					}
@@ -204,9 +206,10 @@
 		 * Update a section that was just loaded
 		 */
 		App.loader.update = function (section) {
-		 	this.currentStatus.updateValueOf(section.name, section.status);
+
+			this.currentStatus.updateValueOf(section.name, section.status);
 		 	
-			 AppEvent.dispatch({
+            AppEvent.dispatch({
 				type: 'action',
 				action: 'load-check'
 		 	});
@@ -281,7 +284,6 @@
 			if('action' === entryPointCb.type) {
 				entryPointCb.body.call();
 			}
-			
 		};
 		 
 	   	/**
@@ -328,7 +330,7 @@
 		 * Mount this into iDoo CORE
 		 */
 		this.exposer.register({
-			namespace: 'app',
+			namespace: 'App',
 			body: App.instance
 		});
 	});

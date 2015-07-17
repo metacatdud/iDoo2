@@ -5,8 +5,8 @@
  
  (function () { 
 	 'use strict';
-	 
-	var Other = new iDoo.entity('other');
+
+	/*var Other = new iDoo.entity('other');
 	 
 	// Events
 	Other.event('event', function() {
@@ -20,6 +20,6 @@
 	 
 	Other.action('other', function() {
 		console.log('action:: Other.other'); 
-	});
+	});*/
 	
  } ());

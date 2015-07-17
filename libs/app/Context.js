@@ -8,6 +8,7 @@
  * @version 0.1.0
  *
  * TODO - Remove Silo static array. Make Exposer more smart
+ * TODO - Make this available for components only.
  */
  
 (function () {
@@ -25,18 +26,29 @@
          * What can be exposed to end dev
          */
         Silo = [
-            'tools.console',
-            'libs.events.Dispatcher',
-            'libs.html.Selector',
-            'core.registry'
+            'libs.html.Selector'
         ];
 
 
         console = I.instance('tools.console');
 
         Context.instance = function (name) {
-            this.name = name;
-            console.log('Prepare context for', this.name);
+            //this.name = name;
+            var context = {};
+
+            for (i_silo = 0; i_silo < Silo.length; i_silo +=1) {
+                var tmpComponent;
+
+                tmpComponent = I.require(Silo[i_silo]);
+
+                if ('function' === typeof  tmpComponent) {
+                    tmpComponent = new tmpComponent(name);
+                }
+
+                context.setValueOf(Silo[i_silo], tmpComponent);
+            }
+
+            return context;
         };
 
         I.register(Context.instance);

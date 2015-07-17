@@ -1,5 +1,5 @@
 /**
- * iDoo entity designer - define enities that will be mounted into your app instance 
+ * iDoo entity designer - define entities that will be mounted into your Components
  * 
  * @package libs/app
  * @authir Tibi
@@ -13,9 +13,7 @@
 		/**
 		 * Entity main object
 		 */
-		var Entity = {
-			instance: {}
-		},
+		var Entity = {},
 			console,
 			Context,
 			EventInstance,
@@ -23,10 +21,10 @@
 		
 		// Dependencies	
 		console = I.instance('tools.console');
-
 		Context = I.require('libs.app.Context');
-
 		EventInstance = I.require('libs.events.Dispatcher');
+
+
 		Event = new EventInstance('Entity');
 		
 		/**
@@ -36,12 +34,6 @@
 			this.name = name;
 
 			this.context = new Context(this.name);
-
-			Event.dispatch({
-				namespace: 'App',
-				type: 'action',
-				action: 'entity-register'
-			}, this.name);
 		};
 		
 		/**
@@ -66,6 +58,7 @@
 		
 		/**
 		 * Define an event fot entity
+		 * TODO - Add event functionality
 		 */
 		Entity.instance.prototype.event = function (header, body) {
 			var entity;
@@ -75,7 +68,7 @@
 				header: header,
 				type: 'event'	
 			};
-			
+
 			entity.setValueOf('body', body.bind(this.context));
 			
 			Event.dispatch({
@@ -84,12 +77,23 @@
 				action: 'entity-update'
 			}, entity);
 		};
-		
+
+		Entity.instance.prototype.registerToComponent = function (component) {
+			Event.dispatch({
+				namespace: 'Component',
+				type: 'action',
+				action: 'entity-register'
+			}, {
+				component: component,
+				data: this
+			});
+		};
+
 		/**
 		 * Register Entity component
 		 */
 		this.exposer.register({
-			namespace: 'entity',
+			namespace: 'Entity',
 			body: Entity.instance
 		});
 	});

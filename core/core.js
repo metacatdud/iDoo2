@@ -25,7 +25,7 @@ window.iDoo = (function (iDooConfig) {
         },
         Install;
 
-    console.log('iDoo2 Core ver ' + iDooConfig.version);
+    console.log('iDoo ver ' + iDooConfig.version);
 
     /**
      * --------------------------
