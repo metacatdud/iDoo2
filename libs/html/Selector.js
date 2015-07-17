@@ -21,19 +21,13 @@
 			registry,
 			console;
 
-		registry = I.require('core.registry');
+		registry = I.instance('core.registry');
 		console = I.instance('tools.console');
-		
+
 		/**
 		 * Init new dom container
 		 */
-		DOM.init = function () {
-			var key;
-			key = I.require('tools.generator').keygen({ length: 10 });
-			
-			registry.set(key, {});
-			DOM.key = key;
-		};
+		DOM.init = function () {};
 		
 		/**
 		 * @constructor
@@ -51,8 +45,9 @@
 				return false;
 			}
 			
-			if(false === registry.get(DOM.key + '.' + selector)) {
-				registry.set(DOM.key + '.' + selector, this.element);
+			if(false === registry.get(selector)) {
+				registry.set(selector, this.element);
+				registry.set('from', 'Selector lib');
 			}
 		};
 		
@@ -83,7 +78,7 @@
 		 * @return mixed boolean|HTMLElement
 		 */
 		DOM.get = function(dataname) {
-			return registry.get(this.key + '.' + dataname)
+			return registry.get(dataname)
 		};
 		
 		/**
@@ -91,7 +86,7 @@
 		 * @return mixed boolean|HTMLElement
 		 */
 		DOM.delete = function (dataname) {
-			return registry.delete(this.key + '.' + dataname);
+			return registry.delete(dataname);
 		};
 		 
 		/**

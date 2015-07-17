@@ -19,11 +19,9 @@
             types: ['action', 'shout', 'chain', 'to']
 		},
 			Event = {},
-			console,
-			reg;
+			console;
 
 		console = I.instance('tools.console');
-		reg = I.require('core.registry');
 
         /**
          * create - Creates a new event listener
@@ -111,10 +109,7 @@
           */
          EventBus.exec = function (event) {
             var actionIsPersistent,
-                dispatchCb,
-                targetContainer;
-            
-            targetContainer =  EventBus.container.getValueOf(event.namespace, false);
+                dispatchCb;
             
             //TODO - Handle other types
             if ('action' === event.type) {
