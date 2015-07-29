@@ -103,7 +103,7 @@
 		};
 		
 		/**
-		 * Init applicaiton.
+		 * Init application.
 		 *  - Store instance 
 		 *  - Load entrypoint
 		 */
@@ -216,6 +216,7 @@
 		};
 		
 		/**
+		 * @deprecated
 		 * @event listener
 		 * App entity registry handler
 		 */
@@ -240,6 +241,7 @@
 		};
 		
 		/**
+		 * @deprecated
 		 * @event lsitener
 		 * App entity update
 		 * 

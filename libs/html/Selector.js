@@ -47,7 +47,6 @@
 			
 			if(false === registry.get(selector)) {
 				registry.set(selector, this.element);
-				registry.set('from', 'Selector lib');
 			}
 		};
 		
