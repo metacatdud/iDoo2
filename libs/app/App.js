@@ -33,7 +33,7 @@
 
 
 		DOM = I.require('libs.html.Selector');
-                    EventInstance = I.require('libs.events.Dispatcher');
+		EventInstance = I.require('libs.events.Dispatcher');
 		AppEvent = new EventInstance('App');
 		
 		/**
@@ -278,14 +278,24 @@
 		 * @event listener
 		 * App ready
 		 */
-		App.ready = function (loaded) {
-			var entryPointCb;
+		App.ready = function (component) {
+			var entryPointCb,
+				i_entity,
+				i_method;
 			
-			entryPointCb = App.container.entities.getValueOf(App.container.options.entryPoint);
-			
+			/*entryPointCb = component.name;
+			for(i_entity in component.data) {
+				if(true === component.data.hasOwnProperty(i_entity)) {
+					for(i_method in component.data.getValueOf(i_entity)) {
+						console.log('i_method', i_method);
+					}
+				}
+			}
+
 			if('action' === entryPointCb.type) {
 				entryPointCb.body.call();
-			}
+			}*/
+			console.debug('New component', component);
 		};
 		 
 	   	/**

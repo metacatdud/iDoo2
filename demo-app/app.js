@@ -19,7 +19,7 @@
 (function () {
 	
 	var Demo = new iDoo.App({
-		entryPoint: 'home.index',
+		entryPoint: 'HomeComp.home.index',
 		htmlNode: 'demo-app',
 		load: 'sync',
 		loadList: ['home', 'other'],

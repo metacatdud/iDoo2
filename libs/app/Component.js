@@ -37,20 +37,22 @@
          * @param event
          */
         Component.event.register = function (event) {
-            var regResult;
+            var component;
 
             if (false === Component.entities.getValueOf(event.component, false)) {
                 throw new Exception ('EntityRegisterException', 'Entity [' + event.component + '] does not exist');
             }
 
-            regResult = Component.entity.register(event);
-
+            component = Component.entity.register(event);
+            console.log('Event',event, 'Comp', component);
             /**
              * Signal app that this component is ready and loaded
              */
-            if(true === regResult) {
-                console.log('Register component to app');
-            }
+            Event.dispatch({
+                namespace: 'App',
+                type: 'action',
+                action: 'app-ready'
+            }, component);
 
         };
 
@@ -87,15 +89,17 @@
             component = Component.entities.getValueOf(eventData.component, false);
 
             if(false !== component.getValueOf(eventData.entity.name, false)) {
-                //throw new Exception ('EntityRegisterException', 'Entity [' + eventData.entity.name + '] is already registered');
+                throw new Exception ('EntityRegisterException', 'Entity [' + eventData.entity.name + '] is already registered');
             }
 
             for (i_action in eventData.entity.actions) {
-                console.log('Register action', eventData.entity.name, eventData.entity.actions.getValueOf(i_action));
                 component.setValueOf(eventData.entity.name + '.' + i_action, eventData.entity.actions.getValueOf(i_action));
             }
 
-            console.log(Component.entities);
+            return {
+                name: eventData.component,
+                data: component
+            };
         };
 
         /**

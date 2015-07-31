@@ -32,7 +32,7 @@
 		 */
 		Entity.instance = function (name) {
 			this.name = name;
-
+			this.isEntryPoint = false;
 			this.actions = {};
 			this.events = {};
 		};
