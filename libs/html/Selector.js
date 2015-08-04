@@ -38,7 +38,7 @@
 			var queryString;
 			
 			queryString = '[data-'+ selector + '="' + value + '"]';
-			
+
 			this.element = document.querySelector(queryString);
 			
 			if (null === this.element) {

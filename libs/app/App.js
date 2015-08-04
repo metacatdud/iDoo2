@@ -1,11 +1,11 @@
 /**
- * Application's kit will be exposed through here for end user developer
+ * Application's working kit will be exposed through here for end user developer
  * 
  * @package libs/app
  * @author Tibi
- * @version 0.1.0
+ * @version 0.3.2
  *
- * TODO - Redesign architecture pattern Entity -> Component -> App
+ * TODO - Remove sync loading pattern as it is confusing. Should give this control to entity and component
  */
 
 (function () {
@@ -18,7 +18,7 @@
 		 */
 		var App = {
 			container: {},
-			entity: {},
+			component: {},
 			loader: {}
 		},
 			AppEvent,
@@ -39,6 +39,8 @@
 		/**
 		 * Will instantiate a new application handler
 		 * @constructor
+		 *
+		 * todo - redo this!!!
 		 */
 		App.instance = function (config) {
 			var loadResources;
@@ -198,7 +200,7 @@
 					action: 'app-ready'
 		 		});
 			} else {
-				// console.warn('App not ready', App.loader.currentStatus);
+				//console.warn('App not ready', App.loader.currentStatus);
 			}
 		};
 		
@@ -216,54 +218,6 @@
 		};
 		
 		/**
-		 * @deprecated
-		 * @event listener
-		 * App entity registry handler
-		 */
-		App.entity.register = function (entityName) {
-		
-			if (false !== App.container.getValueOf(entityName, false)) {
-				throw new Exception ('EntityRegisterException', 'Entity [' + entity.header + '] is already regstered');
-			}
-			
-			App.container.entities.setValueOf(entityName, {});
-			
-			if('sync' === App.container.options.load) {
-				App.container.options.loadList.splice(App.container.options.loadList.indexOf(entityName), 1);
-			}
-			
-			if (0 === App.container.options.loadList.length) {
-				App.loader.update({
-					name: 'app',
-					status: true
-				});
-			}
-		};
-		
-		/**
-		 * @deprecated
-		 * @event lsitener
-		 * App entity update
-		 * 
-		 * @param object entityPart
-		 */
-		App.entity.update = function (entityPart) {
-			
-			App.container.entities.setValueOf(entityPart.name + '.' + entityPart.header, {
-				type: entityPart.type,
-				body: entityPart.body
-			});
-			
-			// If this is the entrypoint signal to loader
-			if (App.container.options.entryPoint === entityPart.name + '.' + entityPart.header) {
-				App.loader.update({
-					name: 'entrypoint',
-					status: true
-				});
-			}
-		};
-		
-		/**
 		 * @event listener
 		 * Page DOM ready
 		 */
@@ -278,42 +232,53 @@
 		 * @event listener
 		 * App ready
 		 */
-		App.ready = function (component) {
-			var entryPointCb,
+		App.ready = function () {
+
+			App.container.components.getValueOf(App.container.options.entryPoint).call();
+		};
+
+		/**
+		 * Install new component
+		 */
+		App.component.install = function (component) {
+			var namespace,
 				i_entity,
 				i_method;
-			
-			/*entryPointCb = component.name;
+
 			for(i_entity in component.data) {
 				if(true === component.data.hasOwnProperty(i_entity)) {
 					for(i_method in component.data.getValueOf(i_entity)) {
-						console.log('i_method', i_method);
+						namespace = component.name + '.'+ i_entity + '.' + i_method;
+
+						if (false === App.container.getValueOf(namespace, false)) {
+							App.container.components.setValueOf(namespace, component.data.getValueOf(i_entity + '.' + i_method));
+
+							if(App.container.options.entryPoint === namespace && false === App.loader.currentStatus.entrypoint) {
+
+								App.loader.update({
+									name: 'entrypoint',
+									status: true
+								});
+
+								App.loader.update({
+									name: 'app',
+									status: true
+								});
+							}
+						}
 					}
 				}
 			}
-
-			if('action' === entryPointCb.type) {
-				entryPointCb.body.call();
-			}*/
-			console.debug('New component', component);
 		};
-		 
-	   	/**
-	 	 * @event
-		 * Register entity
-		 */
-		AppEvent.listen({
-			action: 'entity-register'
-		}, App.entity.register);
-		
+
 		/**
-	 	 * @event
-		 * Update entity
+		 * @event
+		 * Entry point check
 		 */
 		AppEvent.listen({
-			action: 'entity-update'
-		}, App.entity.update);
-		
+			action: 'component-install'
+		}, App.component.install);
+
 		/**
 		 * @event
 		 * App page DOM loaded
@@ -328,7 +293,7 @@
 		 */
 		 AppEvent.listen({
 			action: 'load-check'
-		}, App.loader.check);
+		 }, App.loader.check);
 		
 		/**
 		 * @event

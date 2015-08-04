@@ -15,11 +15,11 @@
 	});
   	*/
 	// Actions
-	Other.action('index', function() {
+	Other.action('index', function () {
 		console.log('action:: Other.index'); 
 	});
 	 
-	Other.action('other', function() {
+	Other.action('other', function () {
 		console.log('action:: Other.other'); 
 	});
 	 Other.registerToComponent('HomeComp');

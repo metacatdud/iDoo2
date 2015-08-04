@@ -44,14 +44,14 @@
             }
 
             component = Component.entity.register(event);
-            console.log('Event',event, 'Comp', component);
+
             /**
              * Signal app that this component is ready and loaded
              */
             Event.dispatch({
                 namespace: 'App',
                 type: 'action',
-                action: 'app-ready'
+                action: 'component-install'
             }, component);
 
         };
@@ -78,13 +78,28 @@
         };
 
         /**
+         * ----------------------------------------
+         * GLOBALS FOR child entities
+         * ----------------------------------------
+         * .setViewsPath - either selector or backend req
+         * TEST CASES:
+         *
+         * - setViewsPath ('parent-placeholder')
+         *      <template data-name="parent-placeholder"> ? name of the component maybe?!
+         *          <div action="home.index"></div>
+         *          - or -
+         *          <div action="home.index" url="true"></div> --> call server (resources_url?tpl=home.index)
+         *      </template>
+         * .tools - move contexts here?!?!
+         */
+
+        /**
          * Component entity register
          * @return mixed
          */
         Component.entity.register = function (eventData) {
             var component,
-                i_action,
-                i_event;
+                i_action;
 
             component = Component.entities.getValueOf(eventData.component, false);
 

@@ -11,15 +11,16 @@
 
 
     HomeComp = new iDoo.Component('HomeComp');
+
     home = new iDoo.Entity('home');
-    home.isEntryPoint = true;
 
-    home.action('index', function() {
-     console.log('action:: home.index');
-    });
+    home.action('index', function () {
+        console.log('action:: home.index');
 
-    home.action('other', function() {
-     console.log('action:: home.other');
+        //todo - Rethink this! It's ugly!
+        this.libs.html.Selector.get('app').innerHTML = 'HOMEPAGE LOADED!';
+
+        //todo - test case - context carry - validate(data) / view(data) / crud(data)
     });
 
     home.registerToComponent('HomeComp');

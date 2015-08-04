@@ -32,13 +32,12 @@
 		 */
 		Entity.instance = function (name) {
 			this.name = name;
-			this.isEntryPoint = false;
 			this.actions = {};
 			this.events = {};
 		};
 		
 		/**
-		 * Define an action fot entity
+		 * Define an action for entity
 		 */
 		Entity.instance.prototype.action = function (header, body) {
 
@@ -50,27 +49,11 @@
 		};
 		
 		/**
-		 * Define an event fot entity
-		 * TODO - Add event functionality
-		 * TODO - Subscribe to component not to main App
+		 * --------------------------------
+		 * Entity toolbox
+		 * --------------------------------
+		 * .setViewsPath -> should override parent component
 		 */
-		/*Entity.instance.prototype.event = function (header, body) {
-			var entity;
-
-			entity = {
-				name: this.name,
-				header: header,
-				type: 'event'	
-			};
-
-			entity.setValueOf('body', body.bind(this.context));
-			
-			Event.dispatch({
-				namespace: 'App',
-				type: 'action',
-				action: 'entity-update'
-			}, entity);
-		};*/
 
 		/**
 		 * Register this entity to a component owner
