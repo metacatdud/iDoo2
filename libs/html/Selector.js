@@ -2,11 +2,10 @@
  * Data selector wrapper with dataset support
  * !!! Very low level. Should not be used by end-dev for application
  * 
- * @package helpers
+ * @package libs/html
  * @author Tibi
  * @version 0.1.0
- * 
- * //TODO - Remove
+ *
  */
 (function () {
 	'use strict';
@@ -82,7 +81,7 @@
 		
 		/**
 		 * Remove element from internal DOM storage
-		 * @return mixed boolean|HTMLElement
+		 * @return boolean
 		 */
 		DOM.delete = function (dataname) {
 			return registry.delete(dataname);
