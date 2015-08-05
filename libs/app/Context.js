@@ -33,20 +33,19 @@
         console = I.instance('tools.console');
 
         Context.instance = function (name) {
-            //this.name = name;
             var context = {};
 
-            for (i_silo = 0; i_silo < Silo.length; i_silo +=1) {
-                var tmpComponent;
+            /**
+             * HARDCODED PATHS FOR TESTING PURPOSES
+             */
+            //View
+            var view = I.require('libs.html.View');
+            view = new view.instance(name);
 
-                tmpComponent = I.require(Silo[i_silo]);
+            context.setValueOf('view', function() {
+                return view.data.bind(view);
+            });
 
-                if ('function' === typeof  tmpComponent) {
-                    tmpComponent = new tmpComponent(name);
-                }
-
-                context.setValueOf(Silo[i_silo], tmpComponent);
-            }
 
             return context;
         };

@@ -34,6 +34,7 @@
 			this.name = name;
 			this.actions = {};
 			this.events = {};
+			/*this.context = new Context(this.name);*/
 		};
 		
 		/**
@@ -45,7 +46,7 @@
 				throw new Exception ('EntityActionException', 'Action [' + header + '] is already defined');
 			}
 
-			this.actions.setValueOf(header, body.bind(new Context(this.name)));
+			this.actions.setValueOf(header, body.bind(new Context(this.name + '.' + header), [].concat(Array.prototype.slice.call(arguments, 0))));
 		};
 		
 		/**

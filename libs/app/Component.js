@@ -91,6 +91,7 @@
          *          <div action="home.index" url="true"></div> --> call server (resources_url?tpl=home.index)
          *      </template>
          * .tools - move contexts here?!?!
+         * .share - share various object with children entities
          */
 
         /**
