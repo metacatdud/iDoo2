@@ -7,22 +7,38 @@
     'use strict';
 
     var HomeComp,
-        home;
+        home,
+        ajax;
 
-
+    // Should be in other file
     HomeComp = new iDoo.Component('HomeComp');
 
+    // Deps
+    // MOVE THESE INSIDE A CONTEXT
+    ajax = iDoo.V('aja');
+
+    // Declaration
     home = new iDoo.Entity('home');
 
     home.action('index', function () {
-        console.log('action:: home.index');
 
-        //todo - Rethink this! It's ugly!
-        this.libs.html.Selector.get('app').innerHTML = 'HOMEPAGE LOADED!';
+        var name = 'Tibi Georgescu',
+            age = 31,
+            view;
 
-        //todo - test case - context carry - validate(data) / view(data) / crud(data)
+        view = this.view();
+        view({
+            name: name,
+            age: age
+        });
+
+        // This works only here because is when DOM is ready
+        /*ajax.html({}, function(res){
+            console.debug('Ajax resp::', res);
+        });*/
     });
 
+    //--- Register entity to a component
     home.registerToComponent('HomeComp');
 
 } ());

@@ -19,14 +19,25 @@
         <script src="libs/events/Dispatcher.js"></script>
 
         <script src="libs/html/Selector.js"></script>
+        <script src="libs/html/View.js"></script>
 
+        <script src="libs/vendors/Interface.js"></script>
+
+        <!--VENDORS GOES HERE !!!-->
+        <script src="vendors/ajax/src/aja.min.js"></script>
+        <script src="vendors/ajax/Ajax.js"></script>
+        <!--VENDORS DOWN TILL HERE !!!-->
+
+        <!-- APP LIB SHOULD BE LAST AS EVERYTHING IS PACKED IN HERE -->
         <script src="libs/app/Context.js"></script>
         <script src="libs/app/App.js"></script>
         <script src="libs/app/Component.js"></script>
         <script src="libs/app/Entity.js"></script>
         
         <!-- ======== THIS SHOULD BE COMPRESSED ==================== -->
-        
+
+
+
         <!-- APP GOES BELOw THIS LINE -->
         <script src="demo-app/app.js"></script>
         <script src="demo-app/home.js"></script>
@@ -34,5 +45,6 @@
     </head>
     <body data-app="demo-app">
         //App goes here
+        <div class="content"></div>
     </body>
 </html>
